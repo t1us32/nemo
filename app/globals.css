@@ -1,24 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  /* dark navy: header/footer/mobile-menu chrome + default ink text on light panels */
+  /* dark navy: header/footer/mobile-menu chrome, and the ground the page sits on */
   --color-abyss: #23303c;
-  --color-abyss-2: #2f4e6b;
-  /* white: text/borders on the dark chrome only */
+  /* white: text/borders on the dark chrome */
   --color-foam: #ffffff;
   --color-foam-muted: rgba(255, 255, 255, 0.65);
   --color-foam-faint: rgba(255, 255, 255, 0.14);
-  /* dark ink: text/borders on the light panels */
+  /* Section copy overrides both of these to their on-footage values; the defaults
+     only matter to anything drawn outside a section. */
   --color-ink-muted: rgba(35, 48, 60, 0.62);
   --color-ink-faint: rgba(35, 48, 60, 0.12);
-  /* light panel background for the 5 pinned sections */
-  --color-panel: #f6f9fb;
 
-  --color-brass: #337ab7;
-  --color-brass-light: #5b97cc;
+  /* Two accents, two jobs. Brass is warm and means action — it is the only warm
+     thing on a page of sea, so a CTA never disappears into the water behind it.
+     Current is cool and means position: the depth rail, the eyebrows, link hovers. */
+  --color-brass: #c9a24b;
+  --color-brass-light: #dcbb6a;
+  /* Ink for text sitting on brass: navy on brass clears 6.9:1, white would not. */
+  --color-brass-ink: #23303c;
   --color-current: #2f6ba3;
-  --color-current-dim: rgba(47, 107, 163, 0.35);
-  --color-cyan: #00afdf;
 
   --font-display: var(--font-fraunces);
   --font-body: var(--font-inter);
@@ -27,10 +28,10 @@
 
 @theme inline {
   --color-abyss: var(--color-abyss);
-  --color-abyss-2: var(--color-abyss-2);
   --color-foam: var(--color-foam);
   --color-brass: var(--color-brass);
   --color-brass-light: var(--color-brass-light);
+  --color-brass-ink: var(--color-brass-ink);
   --color-current: var(--color-current);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -42,22 +43,13 @@
 }
 
 html {
-  background: var(--color-panel);
-  scroll-behavior: auto;
-}
-
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
+  background: var(--color-abyss);
   scroll-behavior: auto;
 }
 
 body {
-  background: var(--color-panel);
-  color: var(--color-abyss);
+  background: var(--color-abyss);
+  color: var(--color-foam);
   font-family: var(--font-body), sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -65,7 +57,7 @@ body {
 
 ::selection {
   background: var(--color-brass);
-  color: #ffffff;
+  color: var(--color-brass-ink);
 }
 
 :focus-visible {
@@ -73,8 +65,13 @@ body {
   outline-offset: 3px;
 }
 
+/* Fraunces off its defaults: display optical size opens the counters at headline
+   scale, SOFT rounds the terminals the way wet glass rounds an edge, and WONK swaps
+   in the alternate g/y so the type has a hand in it rather than a default. */
 .font-display {
   font-family: var(--font-display), serif;
+  font-variation-settings: "opsz" 120, "SOFT" 45, "WONK" 1;
+  letter-spacing: -0.015em;
 }
 
 .section-viewport {

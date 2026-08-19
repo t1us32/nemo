@@ -8,22 +8,22 @@ import RoomCard from "@/components/ui/RoomCard";
 export default function RoomsSection() {
   const c = content.rooms;
   return (
-    <Section id="rooms" index={4}>
+    <Section id="rooms" index={5}>
       <Label>{c.label}</Label>
       <TextReveal
         as="h2"
         text={c.headline}
         wordSplit
-        className="font-display text-5xl md:text-6xl lg:text-7xl mt-4 mb-5"
+        className="font-display font-semibold text-4xl sm:text-5xl md:text-6xl lg:text-7xl mt-3 md:mt-4 mb-3 md:mb-5"
       />
       <TextReveal
         text={c.subheadline}
-        className="text-base md:text-lg text-[var(--color-ink-muted)] max-w-xl leading-relaxed mb-8"
+        className="text-sm md:text-lg text-[var(--color-ink-muted)] max-w-xl mx-auto leading-relaxed mb-5 md:mb-8"
       />
 
-      <div className="flex gap-6 overflow-x-auto snap-x pb-2 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-7 mb-9 -mx-1 px-1">
-        {c.items.map((item, i) => (
-          <RoomCard key={item.name} name={item.name} text={item.text} index={i} />
+      <div className="flex gap-6 overflow-x-auto snap-x pb-2 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-7 mb-6 md:mb-9 -mx-1 px-1">
+        {c.items.map((item) => (
+          <RoomCard key={item.name} name={item.name} meta={item.meta} text={item.text} />
         ))}
       </div>
 

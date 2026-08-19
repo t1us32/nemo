@@ -16,10 +16,11 @@ export default function Section({ id, index, children }: Props) {
   const innerRef = useRef<HTMLDivElement | null>(null);
   const enterRef = useRef<gsap.core.Timeline | null>(null);
   const exitRef = useRef<gsap.core.Tween | null>(null);
-  const { index: active, transitioning, released } = useScrollStage();
+  const { index: active, transitioning, released, staged } = useScrollStage();
 
-  // Text belongs to a rest, never to the flight between two of them.
-  const visible = !released && !transitioning && active === index;
+  // On the stage, text belongs to a rest and never to the flight between two of
+  // them. Off it, the page is a document: every section is simply there.
+  const visible = staged ? !released && !transitioning && active === index : true;
 
   useGSAP(
     () => {
@@ -34,14 +35,14 @@ export default function Section({ id, index, children }: Props) {
       const cards = section.querySelectorAll("[data-room-card]");
       const cta = section.querySelectorAll('[data-reveal="cta"]');
 
-      gsap.set(section, { opacity: 0 });
-
-      if (prefersReducedMotion()) {
-        const tl = gsap.timeline({ paused: true });
-        tl.set(section, { opacity: 1 });
-        enterRef.current = tl;
+      if (!staged || prefersReducedMotion()) {
+        gsap.set(section, { opacity: 1 });
+        gsap.set(inner, { y: 0 });
+        enterRef.current = null;
         return;
       }
+
+      gsap.set(section, { opacity: 0 });
 
       const tl = gsap.timeline({ paused: true });
 
@@ -50,7 +51,7 @@ export default function Section({ id, index, children }: Props) {
       // A hairline drawn out from the left starts the whole thing.
       tl.fromTo(
         rule,
-        { scaleX: 0, transformOrigin: "left center" },
+        { scaleX: 0, transformOrigin: "center" },
         { scaleX: 1, duration: 0.8, ease: ease.expo },
         0
       );
@@ -101,16 +102,23 @@ export default function Section({ id, index, children }: Props) {
 
       enterRef.current = tl;
     },
-    { scope: sectionRef, dependencies: [] }
+    { scope: sectionRef, dependencies: [staged], revertOnUpdate: true }
   );
 
   useEffect(() => {
     const enter = enterRef.current;
     const section = sectionRef.current;
     const inner = innerRef.current;
-    if (!enter || !section || !inner) return;
+    if (!section || !inner) return;
 
     exitRef.current?.kill();
+
+    if (!enter) {
+      // No stage, no choreography: the copy is on screen and stays there.
+      gsap.set(section, { opacity: 1 });
+      gsap.set(inner, { y: 0 });
+      return;
+    }
 
     if (visible) {
       gsap.set(inner, { y: 0 });
@@ -119,10 +127,6 @@ export default function Section({ id, index, children }: Props) {
     }
 
     enter.pause();
-    if (prefersReducedMotion()) {
-      gsap.set(section, { opacity: 0 });
-      return;
-    }
     // Leaving is one clean drift up, not a rewind of the entrance.
     exitRef.current = gsap.to(section, {
       opacity: 0,
@@ -130,7 +134,7 @@ export default function Section({ id, index, children }: Props) {
       ease: ease.exit,
     });
     gsap.to(inner, { y: -18, duration: duration.exit, ease: ease.exit });
-  }, [visible]);
+  }, [visible, staged]);
 
   return (
     <section
@@ -138,7 +142,14 @@ export default function Section({ id, index, children }: Props) {
       id={id}
       data-section-index={index}
       aria-hidden={!visible}
-      className="fixed inset-0 w-full h-[100dvh] overflow-hidden text-white"
+      // A section waiting off screen is out of the tab order too — without this the
+      // keyboard walks into CTAs nobody can see.
+      inert={!visible}
+      className={
+        staged
+          ? "fixed inset-0 w-full h-[100dvh] overflow-hidden text-white"
+          : "relative w-full min-h-[100dvh] flex items-center text-white"
+      }
       style={{
         zIndex: 10 + index,
         pointerEvents: visible ? "auto" : "none",
@@ -151,9 +162,25 @@ export default function Section({ id, index, children }: Props) {
     >
       <div
         ref={innerRef}
-        className="relative z-10 flex h-full flex-col items-start justify-center px-6 md:px-20 max-w-4xl"
+        // Copy sits in the middle of the frame, centred both ways. The scroll area
+        // below owns any overflow, so plain centring can never push the top of the
+        // block off screen.
+        className={
+          staged
+            ? "relative z-10 mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center text-center"
+            : "relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center"
+        }
       >
-        {children}
+        {/* Its own scroll area: a card-heavy section can run taller than a short
+            phone screen, and the staged page itself never scrolls to bail it out. */}
+        <div
+          data-scroll-area
+          className={`w-full px-6 py-24 md:px-10 md:py-16 ${
+            staged ? "max-h-full overflow-y-auto overscroll-contain" : ""
+          }`}
+        >
+          {children}
+        </div>
       </div>
     </section>
   );

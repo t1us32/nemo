@@ -6,41 +6,70 @@ import { content } from "@/lib/content";
 import { gsap } from "@/lib/gsap";
 
 export default function Header() {
-  const [solid, setSolid] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 80);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!menuRef.current) return;
+    if (!menuOpen || !menuRef.current) return;
     const items = menuRef.current.querySelectorAll("[data-menu-item]");
-    if (menuOpen) {
-      gsap.fromTo(
-        items,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power2.out" }
-      );
-    }
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: "power2.out" }
+    );
+  }, [menuOpen]);
+
+  // Escape closes it, the way every overlay on the web does.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
   return (
     <>
+      {/* No bar, just a fade: the footage runs to the top edge of the frame and the
+          only chrome on it is the menu key, the mark and the booking link. */}
       <header
-        className="fixed top-0 inset-x-0 z-50 transition-colors duration-500 backdrop-blur-md"
+        className="fixed top-0 inset-x-0 z-50"
         style={{
-          background: solid ? "rgba(35, 48, 60, 0.96)" : "var(--color-abyss)",
-          borderBottom: "1px solid var(--color-foam-faint)",
+          background: "linear-gradient(to bottom, rgba(6,12,18,0.6), rgba(6,12,18,0))",
           paddingTop: "env(safe-area-inset-top)",
         }}
       >
-        <div className="mx-auto max-w-7xl px-6 md:px-10 h-20 flex items-center justify-between">
-          <a href="#hero" className="block w-[132px] shrink-0" aria-label="NEMO Hotel Resort & SPA">
+        <div className="relative mx-auto max-w-7xl px-6 md:px-10 h-20 flex items-center justify-between">
+          <button
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="flex items-center gap-3 py-2 text-[var(--color-foam)] hover:text-[var(--color-brass)] transition-colors"
+          >
+            {/* Both rules pivot around the middle of the box, so the cross never
+                grows wider than the burger it replaces. */}
+            <span className="relative block w-6 h-6 shrink-0" aria-hidden="true">
+              <span
+                className="absolute left-0 top-1/2 block w-6 h-px bg-current transition-transform duration-300"
+                style={{ transform: menuOpen ? "rotate(45deg)" : "translateY(-4px)" }}
+              />
+              <span
+                className="absolute left-0 top-1/2 block w-6 h-px bg-current transition-transform duration-300"
+                style={{ transform: menuOpen ? "rotate(-45deg)" : "translateY(4px)" }}
+              />
+            </span>
+            <span className="font-mono-label text-[11px] hidden sm:block">
+              {menuOpen ? "Close" : "Menu"}
+            </span>
+          </button>
+
+          <a
+            href="#hero"
+            onClick={() => setMenuOpen(false)}
+            className="absolute left-1/2 -translate-x-1/2 block w-[120px] md:w-[132px]"
+            aria-label="NEMO Hotel Resort & SPA"
+          >
             <Image
               src="/brand/nemo-logo.svg"
               alt="NEMO Hotel Resort & SPA"
@@ -51,82 +80,33 @@ export default function Header() {
             />
           </a>
 
-          <nav className="hidden md:flex items-center gap-8">
-            {content.header.nav.map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="font-mono-label text-[11px] text-[var(--color-foam-muted)] hover:text-[var(--color-current)] transition-colors"
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
-
           <a
             href="#contacts"
-            className="hidden md:inline-flex px-5 py-2.5 text-[12px] font-mono-label bg-[var(--color-brass)] text-white hover:bg-[var(--color-brass-light)] transition-colors"
+            onClick={() => setMenuOpen(false)}
+            className="inline-flex px-4 md:px-5 py-2.5 text-[11px] md:text-[12px] font-mono-label bg-[var(--color-brass)] text-[var(--color-brass-ink)] hover:bg-[var(--color-brass-light)] transition-colors"
           >
             {content.header.cta}
           </a>
-
-          <button
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden flex flex-col gap-1.5 p-2"
-          >
-            <span
-              className="block w-6 h-px transition-transform"
-              style={{
-                background: "var(--color-foam)",
-                transform: menuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
-              }}
-            />
-            <span
-              className="block w-6 h-px transition-transform"
-              style={{
-                background: "var(--color-foam)",
-                transform: menuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
-              }}
-            />
-          </button>
         </div>
       </header>
 
       {menuOpen && (
         <div
           ref={menuRef}
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 md:hidden"
-          style={{ background: "var(--color-abyss)" }}
+          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-7 backdrop-blur-xl"
+          style={{ background: "rgba(6,12,18,0.55)" }}
         >
-          <Image
-            data-menu-item
-            src="/brand/nemo-logo.svg"
-            alt="NEMO Hotel Resort & SPA"
-            width={300}
-            height={109}
-            className="w-32 h-auto mb-2"
-          />
           {content.header.nav.map((item) => (
             <a
               key={item}
               data-menu-item
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
               onClick={() => setMenuOpen(false)}
-              className="font-display text-3xl text-white"
+              className="font-display font-semibold text-4xl md:text-6xl text-white hover:text-[var(--color-brass)] transition-colors"
             >
               {item}
             </a>
           ))}
-          <a
-            data-menu-item
-            href="#contacts"
-            onClick={() => setMenuOpen(false)}
-            className="mt-4 px-6 py-3 text-[13px] font-mono-label bg-[var(--color-brass)] text-white"
-          >
-            {content.header.cta}
-          </a>
         </div>
       )}
     </>
