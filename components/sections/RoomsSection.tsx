@@ -8,7 +8,7 @@ import RoomCard from "@/components/ui/RoomCard";
 export default function RoomsSection() {
   const c = content.rooms;
   return (
-    <Section id="rooms" index={5}>
+    <Section id="rooms" index={4}>
       <Label>{c.label}</Label>
       <TextReveal
         as="h2"

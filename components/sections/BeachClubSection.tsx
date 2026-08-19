@@ -7,7 +7,7 @@ import CTAButton from "@/components/ui/CTAButton";
 export default function BeachClubSection() {
   const c = content.beachClub;
   return (
-    <Section id="beach-club" index={2}>
+    <Section id="beach-club" index={1}>
       <Label>{c.label}</Label>
       <TextReveal
         as="h2"

@@ -7,15 +7,9 @@ export const stagePoster = "/videos/stages-poster.jpg";
 // Rest frames, one per section. The camera holds on these while the section text
 // is on screen; between two of them the clip plays through — forward on scroll
 // down, rewound on scroll up.
-// The clip opens on an approach from open water, cut straight into the original
-// aerial at 1.833s — no dissolve: the two shots are joined by scale instead, the
-// original's first 48 frames carrying a 1.15x correction that eases back to its own
-// framing by 2s, so the seam reads as one continuous flight. Its far half is cut away
-// so the first frame already shows the hotel rather than a horizon. What the original
-// footage carried therefore sits 1.833s later than it used to. Each rest still lands
-// just before its cut (which now run 10.875, 15.917, 20.958) so the held frame is a
-// clean shot, never a blend of two clips.
-export const stageTimes = [0, 5.08, 10.72, 15.76, 20.8, 26.83] as const;
+// Each rest sits just before its cut (which run 9.042, 14.083, 19.125) so the held
+// frame is a clean shot, never a half-dissolved blend of two clips.
+export const stageTimes = [0, 8.89, 13.93, 18.97, 25.0] as const;
 
 export const content = {
   header: {
@@ -72,16 +66,6 @@ export const content = {
     ],
     cta: "Check rates and availability",
   },
-  // PLACEHOLDER COPY: the approach shot was added after the copy deck was written,
-  // so this rest speaks in the hotel's voice but says nothing the hotel signed off.
-  // Replace before launch.
-  resort: {
-    label: "THE RESORT",
-    headline: "Eleven Pools Above the Water",
-    subheadline:
-      "Heated pools, sun terraces and gardens run the length of the shoreline, and the sea is a few steps from every one of them.",
-    cta: "See the grounds",
-  },
   spa: {
     label: "WELLNESS",
     headline: "A Ritual of Water and Warmth",
@@ -110,15 +94,13 @@ export const content = {
   },
 } as const;
 
-// Stage order follows the footage, not the brochure: the clip comes in off the water,
-// arrives at the resort, then flies the pool deck, the restaurant, the spa and finally
-// a room, so each rest holds the shot its own copy is talking about. Depth is
-// positional.
+// Stage order follows the footage, not the brochure: the clip flies from the aerial
+// establisher to the pool deck, the restaurant, the spa and finally a room, so each
+// rest holds the shot its own copy is talking about. Depth is positional.
 export const sections = [
   { id: "hero", label: content.hero.label, depth: "0M" },
-  { id: "resort", label: content.resort.label, depth: "10M" },
-  { id: "beach-club", label: content.beachClub.label, depth: "20M" },
-  { id: "restaurants", label: content.restaurant.label, depth: "30M" },
-  { id: "spa", label: content.spa.label, depth: "40M" },
-  { id: "rooms", label: content.rooms.label, depth: "50M" },
+  { id: "beach-club", label: content.beachClub.label, depth: "10M" },
+  { id: "restaurants", label: content.restaurant.label, depth: "20M" },
+  { id: "spa", label: content.spa.label, depth: "30M" },
+  { id: "rooms", label: content.rooms.label, depth: "40M" },
 ] as const;

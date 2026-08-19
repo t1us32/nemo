@@ -46,3 +46,6 @@ next-env.d.ts
 # source clips for the stage video — the built master lives in public/videos
 /Hailuo_Video_*.mp4
 /video_no_watermark.mp4
+
+# reconstructed pre-intro version, kept out of the deploy
+/versions/

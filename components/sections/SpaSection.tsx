@@ -7,7 +7,7 @@ import CTAButton from "@/components/ui/CTAButton";
 export default function SpaSection() {
   const c = content.spa;
   return (
-    <Section id="spa" index={4}>
+    <Section id="spa" index={3}>
       <Label>{c.label}</Label>
       <TextReveal
         as="h2"

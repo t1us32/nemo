@@ -22,7 +22,7 @@ export default function HeroSection() {
       {/* A stage id, not a document anchor: the provider intercepts in-page links and
           turns the ones that name a rest into a camera move, so this button is the
           click-driven twin of the first scroll. Booking lives in the header. */}
-      <CTAButton href="#resort">{c.cta}</CTAButton>
+      <CTAButton href="#beach-club">{c.cta}</CTAButton>
 
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3">
         <span className="block h-8 w-px bg-[var(--color-ink-faint)] relative overflow-hidden">

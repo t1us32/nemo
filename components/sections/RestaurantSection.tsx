@@ -7,7 +7,7 @@ import CTAButton from "@/components/ui/CTAButton";
 export default function RestaurantSection() {
   const c = content.restaurant;
   return (
-    <Section id="restaurants" index={3}>
+    <Section id="restaurants" index={2}>
       <Label>{c.label}</Label>
       <TextReveal
         as="h2"
