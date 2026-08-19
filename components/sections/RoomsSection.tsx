@@ -21,7 +21,12 @@ export default function RoomsSection() {
         className="text-sm md:text-lg text-[var(--color-ink-muted)] max-w-xl mx-auto leading-relaxed mb-5 md:mb-8"
       />
 
-      <div className="flex gap-6 overflow-x-auto snap-x pb-2 md:pb-0 md:overflow-visible md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-7 mb-6 md:mb-9 -mx-1 px-1">
+      {/* Phones stack the cards and let the section's own scroll area carry them.
+          They used to sit in a horizontal rail, which showed one room out of six with
+          nothing to say the others existed — and the rail could not even be swiped,
+          since the stage cancels any touch that is not walking a vertical scroll
+          area. Tablets up have the room for the grid. */}
+      <div className="flex flex-col gap-7 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-7 mb-6 md:mb-9">
         {c.items.map((item) => (
           <RoomCard key={item.name} name={item.name} meta={item.meta} text={item.text} />
         ))}
