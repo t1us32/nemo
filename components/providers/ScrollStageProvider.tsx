@@ -10,7 +10,6 @@ import {
   useState,
 } from "react";
 import Image from "next/image";
-import { gsap } from "@/lib/gsap";
 import { sections, stageTimes, stageVideo, stageVideoMobile, stagePoster } from "@/lib/content";
 
 type StageState = {
@@ -49,6 +48,10 @@ const LAST = stageTimes.length - 1;
 const FLIGHT = 1.3;
 /** Chrome drops frames past this; keep the whoosh on the sane side of it. */
 const MAX_RATE = 10;
+/** The clip is 24fps, so a rewind step shorter than this cannot show anything new. */
+const FRAME = 1 / 24;
+/** Treat a seek that has not reported back in this long as lost and issue the next. */
+const SEEK_STUCK = 200;
 /**
  * A leg is flown in three parts. The first share of it is spent winding up, the last
  * share braking, and the stretch between them cruises. Speed inside either ramp is
@@ -134,7 +137,8 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
   const busyRef = useRef(false);
   const releasedRef = useRef(false);
   const rafRef = useRef(0);
-  const tweenRef = useRef<gsap.core.Tween | null>(null);
+  /** Cancels a rewind in flight: drops its listener and forgets it. */
+  const scrubRef = useRef<(() => void) | null>(null);
   const accRef = useRef(0);
   const settleRef = useRef(0);
 
@@ -180,18 +184,60 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
     };
 
     cancelAnimationFrame(rafRef.current);
-    tweenRef.current?.kill();
+    scrubRef.current?.();
 
     // Walking currentTime is the only way back — there is no reverse playback —
     // and it doubles as the fallback when play() is refused.
+    //
+    // The walk is paced by the decoder rather than by the frame clock. Driving it
+    // from a tween asks for a seek every animation frame, roughly sixty a second,
+    // and a machine that cannot serve them that fast does not skip any: it queues
+    // them, and then spends the whole rewind rendering positions the eye has long
+    // moved past. Here at most one seek is ever outstanding, and each new one is
+    // aimed at where the camera should be *now*, so a slow decoder loses frames
+    // instead of falling behind.
     const scrub = () => {
       video.pause();
-      tweenRef.current = gsap.to(video, {
-        currentTime: target,
-        duration: FLIGHT,
-        ease: flightEase,
-        onComplete: finish,
-      });
+      const origin = video.currentTime;
+      const span = target - origin;
+      const started = performance.now();
+      let seeking = false;
+      let issuedAt = 0;
+
+      const onSeeked = () => {
+        seeking = false;
+      };
+      const stop = () => {
+        video.removeEventListener("seeked", onSeeked);
+        scrubRef.current = null;
+      };
+      video.addEventListener("seeked", onSeeked);
+      scrubRef.current = stop;
+
+      const step = () => {
+        const now = performance.now();
+        const t = Math.min(1, (now - started) / (FLIGHT * 1000));
+        if (t >= 1) {
+          stop();
+          video.currentTime = target;
+          finish();
+          return;
+        }
+        // SEEK_STUCK covers a seek whose `seeked` never lands — a decoder hiccup
+        // must not park the rewind for the rest of its flight.
+        if (!seeking || now - issuedAt > SEEK_STUCK) {
+          const next = origin + span * flightEase(t);
+          // Anything under a frame would not change the picture, and a seek to the
+          // position it already holds never fires `seeked` at all.
+          if (Math.abs(next - video.currentTime) >= FRAME) {
+            seeking = true;
+            issuedAt = now;
+            video.currentTime = next;
+          }
+        }
+        rafRef.current = requestAnimationFrame(step);
+      };
+      rafRef.current = requestAnimationFrame(step);
     };
 
     const run = () => {
@@ -444,7 +490,7 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
       lockScroll(false);
       cancelAnimationFrame(rafRef.current);
       window.clearTimeout(settleRef.current);
-      tweenRef.current?.kill();
+      scrubRef.current?.();
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
