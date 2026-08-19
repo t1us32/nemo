@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 import { gsap } from "@/lib/gsap";
 import { sections, stageTimes, stageVideo, stageVideoMobile, stagePoster } from "@/lib/content";
 
@@ -112,6 +113,10 @@ const SETTLE = 260;
 const READY_TIMEOUT = 4000;
 /** Hold the clip back until the poster has had its moment as the LCP frame. */
 const PRELOAD_DELAY = 700;
+/** Give the clip this long to buffer behind the splash before showing the site anyway. */
+const SPLASH_TIMEOUT = 6000;
+/** Splash fade-out length — kept in sync with the CSS transition duration below. */
+const SPLASH_FADE = 500;
 
 export default function ScrollStageProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<StageState>({
@@ -121,6 +126,8 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
     staged: true,
   });
   const [src, setSrc] = useState<string | null>(null);
+  const [splashDone, setSplashDone] = useState(false);
+  const [splashGone, setSplashGone] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const indexRef = useRef(0);
@@ -273,6 +280,48 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
     const id = window.setTimeout(() => setSrc(small ? stageVideoMobile : stageVideo), PRELOAD_DELAY);
     return () => window.clearTimeout(id);
   }, [staged]);
+
+  // The splash holds the site behind a filled screen until the stage clip has
+  // buffered (or reduced motion skips it), so nobody scrolls into a frame that is
+  // still loading. A timeout stands in for a clip that never fires `loadeddata` —
+  // a stalled or errored fetch should not strand the visitor on the splash forever.
+  useEffect(() => {
+    if (!staged) {
+      setSplashDone(true);
+      return;
+    }
+    if (!src) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.readyState >= 2) {
+      setSplashDone(true);
+      return;
+    }
+
+    let settled = false;
+    const onReady = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      video.removeEventListener("loadeddata", onReady);
+      setSplashDone(true);
+    };
+    const timer = window.setTimeout(onReady, SPLASH_TIMEOUT);
+    video.addEventListener("loadeddata", onReady);
+    return () => {
+      settled = true;
+      clearTimeout(timer);
+      video.removeEventListener("loadeddata", onReady);
+    };
+  }, [staged, src]);
+
+  useEffect(() => {
+    if (!splashDone) return;
+    const id = window.setTimeout(() => setSplashGone(true), SPLASH_FADE);
+    return () => window.clearTimeout(id);
+  }, [splashDone]);
 
   useEffect(() => {
     if (!staged) return;
@@ -438,6 +487,23 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
           }}
         />
       </div>
+      {!splashGone && (
+        <div
+          role="status"
+          aria-label="Loading"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-abyss)] transition-opacity duration-500 ease-out"
+          style={{ opacity: splashDone ? 0 : 1, pointerEvents: splashDone ? "none" : "auto" }}
+        >
+          <Image
+            src="/brand/nemo-logo.svg"
+            alt="NEMO Hotel Resort & SPA"
+            width={300}
+            height={109}
+            priority
+            className="w-[160px] md:w-[200px] h-auto animate-pulse"
+          />
+        </div>
+      )}
       {children}
     </StageContext.Provider>
   );
