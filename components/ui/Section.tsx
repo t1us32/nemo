@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, ease, duration, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, ease, duration } from "@/lib/gsap";
 import { useScrollStage } from "@/components/providers/ScrollStageProvider";
 
 type Props = {
@@ -35,7 +35,7 @@ export default function Section({ id, index, children }: Props) {
       const cards = section.querySelectorAll("[data-room-card]");
       const cta = section.querySelectorAll('[data-reveal="cta"]');
 
-      if (!staged || prefersReducedMotion()) {
+      if (!staged) {
         gsap.set(section, { opacity: 1 });
         gsap.set(inner, { y: 0 });
         enterRef.current = null;
