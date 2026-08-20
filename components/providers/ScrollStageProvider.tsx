@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -20,9 +19,10 @@ type StageState = {
   /** True once the last rest is passed and the page scrolls normally to the footer. */
   released: boolean;
   /**
-   * False when the visitor asked for reduced motion. The camera, the scroll lock and
-   * the clip are all off; every section is a plain block in a document that scrolls
-   * the way the browser intends.
+   * Kept for the sections that still branch on it, but the stage is no longer
+   * turned off by prefers-reduced-motion: too many desktops report it (Windows'
+   * "Play animations" toggle, off by default on plenty of machines) for it to be
+   * a reliable signal of what this visitor actually wants.
    */
   staged: boolean;
 };
@@ -35,10 +35,6 @@ const StageContext = createContext<StageState>({
 });
 
 export const useScrollStage = () => useContext(StageContext);
-
-// The stage decision has to land before the browser paints, or the page flashes one
-// layout and settles into the other.
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const LAST = stageTimes.length - 1;
 /**
@@ -143,15 +139,6 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
   const settleRef = useRef(0);
 
   const staged = state.staged;
-
-  // Reduced motion is a live setting, not a load-time one: follow it both ways.
-  useIsomorphicLayoutEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setState((s) => ({ ...s, staged: !query.matches }));
-    apply();
-    query.addEventListener("change", apply);
-    return () => query.removeEventListener("change", apply);
-  }, []);
 
   const lockScroll = useCallback((locked: boolean) => {
     const value = locked ? "hidden" : "";
