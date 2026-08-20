@@ -1,27 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Bodoni_Moda, Jost } from "next/font/google";
 import "./globals.css";
 import ScrollStageProvider from "@/components/providers/ScrollStageProvider";
-import DepthRail from "@/components/layout/DepthRail";
+import SequenceMark from "@/components/layout/SequenceMark";
 
-// Variable cut, with the axes the headline treatment actually rides: see
-// `.font-display` in globals.css for the settings.
-const displayFont = Fraunces({
-  variable: "--font-fraunces",
+// A Didone for the headlines, carried on its optical size axis — see `.font-display`
+// in globals.css for what that axis is doing.
+const displayFont = Bodoni_Moda({
+  variable: "--font-bodoni",
   subsets: ["latin"],
-  axes: ["SOFT", "WONK", "opsz"],
+  // Variable across weight as well — next/font rejects a fixed weight alongside a
+  // named axis — so the optical size in globals.css is free to move on its own.
+  axes: ["opsz"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
+// Geometric sans against a Didone is the pairing the fashion houses settled on a
+// century ago, and it is what carries both the prose and the small caps here.
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
   weight: ["400", "500"],
   display: "swap",
@@ -66,7 +63,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#23303c",
+  themeColor: "#0b1519",
 };
 
 export default function RootLayout({
@@ -78,10 +75,10 @@ export default function RootLayout({
     // The font variables belong on the root element: globals.css maps them into
     // --font-display / --font-body on :root, and a var defined on <body> is not in
     // scope there — which silently drops every family back to the browser default.
-    <html lang="en" className={`${displayFont.variable} ${inter.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${displayFont.variable} ${jost.variable}`}>
       <body className="antialiased">
         <ScrollStageProvider>
-          <DepthRail />
+          <SequenceMark />
           {children}
         </ScrollStageProvider>
       </body>

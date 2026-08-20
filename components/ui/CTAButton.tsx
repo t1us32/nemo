@@ -1,27 +1,28 @@
 type Props = {
   children: React.ReactNode;
   href?: string;
-  variant?: "brass" | "ghost";
   className?: string;
 };
 
-export default function CTAButton({
-  children,
-  href = "#",
-  variant = "brass",
-  className = "",
-}: Props) {
-  const base =
-    "inline-flex items-center gap-3 px-7 py-3.5 text-[13px] font-mono-label transition-colors duration-300";
-  const styles =
-    variant === "brass"
-      ? "bg-[var(--color-brass)] text-[var(--color-brass-ink)] hover:bg-[var(--color-brass-light)]"
-      : "border border-[var(--color-ink-faint)] text-[var(--color-abyss)] hover:border-[var(--color-current)] hover:text-[var(--color-current)]";
-
+/**
+ * No box and no fill. A filled block of gold is what a booking widget looks like,
+ * and it was the loudest thing on a page whose whole argument is restraint — so the
+ * call to action is a line of small caps with a hairline running off it, mirroring
+ * the rule that enters the eyebrow from the other edge of the frame. The rule is
+ * what lengthens on hover; the words hold still.
+ */
+export default function CTAButton({ children, href = "#", className = "" }: Props) {
   return (
-    <a data-reveal="cta" href={href} className={`${base} ${styles} ${className}`}>
+    <a
+      data-reveal="cta"
+      href={href}
+      className={`group inline-flex items-center gap-4 font-label text-[11px] text-[var(--color-gilt-soft)] transition-colors duration-500 hover:text-[var(--color-foam)] ${className}`}
+    >
       {children}
-      <span aria-hidden="true">&rarr;</span>
+      <span
+        aria-hidden="true"
+        className="block h-px w-10 shrink-0 bg-current transition-[width] duration-500 ease-out group-hover:w-16"
+      />
     </a>
   );
 }

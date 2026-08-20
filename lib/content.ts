@@ -24,11 +24,15 @@ export const content = {
   },
   hero: {
     label: "ODESA · LANZHERON BEACH",
-    headline: "Where the Sea Meets Luxury",
+    // "Where the Sea Meets Luxury" is the line every coastal hotel on the internet
+    // already owns. This one is true of this property and of no other on the coast:
+    // the resort stands on the Lanzheron spit with water round three of its faces,
+    // which is exactly what the opening shot flies in on.
+    headline: "Sea on Three Sides",
     subheadline:
       "NEMO Hotel Resort & SPA — the leading 5-star resort on Odesa's Black Sea coast, with 11 heated pools, a private beach club and panoramic sea views from every terrace.",
-    cta: "Discover more",
-    scrollHint: "SCROLL TO DIVE",
+    cta: "Explore the resort",
+    scrollHint: "Scroll",
   },
   rooms: {
     label: "ACCOMMODATION",
@@ -112,13 +116,12 @@ export const content = {
 
 // Stage order follows the footage, not the brochure: the clip comes in off the water,
 // arrives at the resort, then flies the pool deck, the restaurant, the spa and finally
-// a room, so each rest holds the shot its own copy is talking about. Depth is
-// positional.
+// a room, so each rest holds the shot its own copy is talking about.
 export const sections = [
-  { id: "hero", label: content.hero.label, depth: "0M" },
-  { id: "resort", label: content.resort.label, depth: "10M" },
-  { id: "beach-club", label: content.beachClub.label, depth: "20M" },
-  { id: "restaurants", label: content.restaurant.label, depth: "30M" },
-  { id: "spa", label: content.spa.label, depth: "40M" },
-  { id: "rooms", label: content.rooms.label, depth: "50M" },
+  { id: "hero", label: content.hero.label },
+  { id: "resort", label: content.resort.label },
+  { id: "beach-club", label: content.beachClub.label },
+  { id: "restaurants", label: content.restaurant.label },
+  { id: "spa", label: content.spa.label },
+  { id: "rooms", label: content.rooms.label },
 ] as const;

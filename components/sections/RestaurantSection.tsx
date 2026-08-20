@@ -13,11 +13,11 @@ export default function RestaurantSection() {
         as="h2"
         text={c.headline}
         wordSplit
-        className="font-display font-semibold text-5xl md:text-6xl lg:text-7xl mt-4 mb-5"
+        className="font-display font-normal text-[clamp(2.25rem,5.5vw,4.25rem)] leading-[0.98] mt-8 mb-7"
       />
       <TextReveal
         text={c.subheadline}
-        className="text-base md:text-lg text-[var(--color-ink-muted)] max-w-xl mx-auto leading-relaxed mb-9"
+        className="text-[15px] md:text-[17px] text-[var(--color-ink-muted)] max-w-[33rem] leading-[1.8] mb-11"
       />
       <CTAButton href="#contacts">{c.cta}</CTAButton>
     </Section>

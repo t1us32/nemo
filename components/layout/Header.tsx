@@ -76,16 +76,22 @@ export default function Header() {
       <header
         className="fixed top-0 inset-x-0 z-50"
         style={{
-          background: "linear-gradient(to bottom, rgba(6,12,18,0.6), rgba(6,12,18,0))",
+          background: "linear-gradient(to bottom, rgba(6,13,16,0.55), rgba(6,13,16,0))",
           paddingTop: "env(safe-area-inset-top)",
         }}
       >
-        <div className="relative mx-auto max-w-7xl px-6 md:px-10 h-20 flex items-center justify-between">
+        {/* No max width here on purpose: the menu key and the booking link sit on the
+            same gutter the copy is measured from, so every edge on the page lines up
+            against the frame rather than against a centred container. */}
+        <div
+          className="relative h-20 flex items-center justify-between"
+          style={{ paddingLeft: "var(--gutter)", paddingRight: "var(--gutter)" }}
+        >
           <button
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex items-center gap-3 py-2 text-[var(--color-foam)] hover:text-[var(--color-brass)] transition-colors"
+            className="flex items-center gap-3 py-2 text-[var(--color-foam)] hover:text-[var(--color-gilt)] transition-colors"
           >
             {/* Both rules pivot around the middle of the box, so the cross never
                 grows wider than the burger it replaces. */}
@@ -99,7 +105,7 @@ export default function Header() {
                 style={{ transform: menuOpen ? "rotate(-45deg)" : "translateY(4px)" }}
               />
             </span>
-            <span className="font-mono-label text-[11px] hidden sm:block">
+            <span className="font-label text-[11px] hidden sm:block">
               {menuOpen ? "Close" : "Menu"}
             </span>
           </button>
@@ -107,7 +113,10 @@ export default function Header() {
           <a
             href="#hero"
             onClick={() => setMenuOpen(false)}
-            className="absolute left-1/2 -translate-x-1/2 block w-[120px] md:w-[132px]"
+            // Narrow phones have to fit the mark between the menu key and the booking
+            // link with the mark still centred on the frame; at the old width the two
+            // touched.
+            className="absolute left-1/2 -translate-x-1/2 block w-[92px] sm:w-[120px] md:w-[132px]"
             aria-label="NEMO Hotel Resort & SPA"
           >
             <Image
@@ -123,7 +132,11 @@ export default function Header() {
           <a
             href="#contacts"
             onClick={() => setMenuOpen(false)}
-            className="inline-flex px-4 md:px-5 py-2.5 text-[11px] md:text-[12px] font-mono-label bg-[var(--color-brass)] text-[var(--color-brass-ink)] hover:bg-[var(--color-brass-light)] transition-colors"
+            // A hairline box, not a filled one. A solid gold block is the single
+            // cheapest mark a hotel page can put on a photograph — it reads as a
+            // booking widget bolted to the corner. Outlined, it still sits where the
+            // eye looks for it and still fills in under the cursor.
+            className="inline-flex shrink-0 border border-[var(--color-foam-faint)] px-3 sm:px-5 md:px-6 py-2.5 text-[9px] sm:text-[10px] md:text-[11px] font-label text-[var(--color-foam)] transition-colors duration-500 hover:border-[var(--color-gilt-soft)] hover:bg-[var(--color-gilt-soft)] hover:text-[var(--color-gilt-ink)]"
           >
             {content.header.cta}
           </a>
@@ -133,9 +146,11 @@ export default function Header() {
       {menuMounted && (
         <div
           ref={menuRef}
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-7"
+          className="fixed inset-0 z-40 flex flex-col items-start justify-center gap-3 md:gap-4"
           style={{
-            background: "rgba(6,12,18,0.55)",
+            paddingLeft: "var(--gutter)",
+            paddingRight: "var(--gutter)",
+            background: "rgba(6,13,16,0.62)",
             backdropFilter: menuVisible ? "blur(20px)" : "blur(0px)",
             WebkitBackdropFilter: menuVisible ? "blur(20px)" : "blur(0px)",
             opacity: menuVisible ? 1 : 0,
@@ -148,7 +163,7 @@ export default function Header() {
               data-menu-item
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
               onClick={() => setMenuOpen(false)}
-              className="font-display font-semibold text-4xl md:text-6xl text-white hover:text-[var(--color-brass)] transition-colors"
+              className="font-display font-normal text-[2.5rem] md:text-[4rem] leading-[1.15] text-[var(--color-foam)] transition-colors duration-500 hover:text-[var(--color-gilt-soft)]"
             >
               {item}
             </a>

@@ -1,41 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  /* dark navy: header/footer/mobile-menu chrome, and the ground the page sits on */
-  --color-abyss: #23303c;
-  /* white: text/borders on the dark chrome */
-  --color-foam: #ffffff;
-  --color-foam-muted: rgba(255, 255, 255, 0.65);
-  --color-foam-faint: rgba(255, 255, 255, 0.14);
+  /* The ground the page sits on, and the chrome drawn on it: header, footer, splash.
+     Deeper and cooler than a slate — everything laid on it reads more expensive for
+     it, and it is close enough to the shadowed water in the footage to sit under it. */
+  --color-abyss: #0b1519;
+  --color-abyss-deep: #060d10;
+
+  /* Off-white, warmed a touch. Pure #fff on photography is a glare; this is the
+     white a printed brochure actually uses. */
+  --color-foam: #f6f3ee;
+  --color-foam-muted: rgba(246, 243, 238, 0.72);
+  --color-foam-faint: rgba(246, 243, 238, 0.16);
   /* Section copy overrides both of these to their on-footage values; the defaults
      only matter to anything drawn outside a section. */
-  --color-ink-muted: rgba(35, 48, 60, 0.62);
-  --color-ink-faint: rgba(35, 48, 60, 0.12);
+  --color-ink-muted: rgba(11, 21, 25, 0.62);
+  --color-ink-faint: rgba(11, 21, 25, 0.12);
 
-  /* Two accents, two jobs. Brass is warm and means action — it is the only warm
-     thing on a page of sea, so a CTA never disappears into the water behind it.
-     Current is cool and means position: the depth rail, the eyebrows, link hovers. */
-  --color-brass: #c9a24b;
-  --color-brass-light: #dcbb6a;
-  /* Ink for text sitting on brass: navy on brass clears 6.9:1, white would not. */
-  --color-brass-ink: #23303c;
-  --color-current: #2f6ba3;
+  /* One accent, not two. A filled block of saturated gold is the single cheapest
+     thing a hotel page can put on a photograph, and a mid-blue eyebrow was losing
+     against the sea it sat on. What is left is a champagne gilt used at hairline
+     weight — rules, eyebrows, the underline under a call to action — and filled in
+     only on hover, at the size of a line of small caps. */
+  --color-gilt: #c8a96a;
+  --color-gilt-soft: #e2d0ac;
+  --color-gilt-ink: #0b1519;
 
-  --font-display: var(--font-fraunces);
-  --font-body: var(--font-inter);
-  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-bodoni);
+  --font-body: var(--font-jost);
+
+  /* The distance from the edge of the frame to the copy. Anything that measures
+     itself against the frame rather than against the text — the eyebrow's hairline
+     above all, which starts at the very edge of the viewport and crosses the gutter
+     to reach the words — reads it from here, so the two cannot drift apart at a
+     breakpoint. */
+  --gutter: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 3.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: 6rem;
+  }
 }
 
 @theme inline {
   --color-abyss: var(--color-abyss);
+  --color-abyss-deep: var(--color-abyss-deep);
   --color-foam: var(--color-foam);
-  --color-brass: var(--color-brass);
-  --color-brass-light: var(--color-brass-light);
-  --color-brass-ink: var(--color-brass-ink);
-  --color-current: var(--color-current);
+  --color-gilt: var(--color-gilt);
+  --color-gilt-soft: var(--color-gilt-soft);
+  --color-gilt-ink: var(--color-gilt-ink);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
 }
 
 * {
@@ -56,22 +78,30 @@ body {
 }
 
 ::selection {
-  background: var(--color-brass);
-  color: var(--color-brass-ink);
+  background: var(--color-gilt);
+  color: var(--color-gilt-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-current);
-  outline-offset: 3px;
+  outline: 1px solid var(--color-gilt-soft);
+  outline-offset: 4px;
 }
 
-/* Fraunces off its defaults: display optical size opens the counters at headline
-   scale, SOFT rounds the terminals the way wet glass rounds an edge, and WONK swaps
-   in the alternate g/y so the type has a hand in it rather than a default. */
+/* Bodoni Moda is a Didone: its whole character is the jump from stem to hairline,
+   and that ratio is carried on the optical size axis rather than the weight. Pushed
+   to the top of the axis the serifs go to a true hairline, which is what makes the
+   headline read as set rather than typed — and which only holds at display sizes,
+   hence the second class for anything smaller. */
 .font-display {
   font-family: var(--font-display), serif;
-  font-variation-settings: "opsz" 120, "SOFT" 45, "WONK" 1;
-  letter-spacing: -0.015em;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.02em;
+}
+
+.font-display-sm {
+  font-family: var(--font-display), serif;
+  font-variation-settings: "opsz" 22;
+  letter-spacing: -0.005em;
 }
 
 .section-viewport {
@@ -84,8 +114,33 @@ body {
   }
 }
 
-.font-mono-label {
-  font-family: var(--font-mono), monospace;
-  letter-spacing: 0.18em;
+/* Wide-tracked geometric caps: the lettering on hotel signage and the plate captions
+   in an architecture monograph. The page used a monospace here, which reads as a
+   terminal no matter what it is spelling. */
+.font-label {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
+}
+
+/* The page's two waiting states, and they are the same gesture at two scales: a
+   short bright segment travelling along a hairline. One runs down the scroll mark
+   on the opening shot, the other across the splash while the clip buffers. */
+@keyframes scrollhint {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
 }

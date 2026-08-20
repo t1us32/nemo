@@ -514,15 +514,19 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
             className="absolute inset-0 h-full w-full object-cover"
           />
         )}
-        {/* The copy sits in the middle of the frame, so the scrim does too: a soft
-            centre well deep enough to carry white text over a bright pool shot,
-            plus a top and bottom band for the header and the scroll hint. */}
+        {/* The scrim follows the copy, and the copy sits low and left — so this is a
+            wash up from the floor of the frame and in from its left edge, not the
+            centred vignette that used to sit here. That vignette dulled the middle
+            of every shot, which is precisely where the building, the deck and the
+            pools are. Off this, the top right of each frame stays at full strength:
+            the visitor is looking at the property, not through a grey veil at it. */}
         <div
           className="absolute inset-0"
           style={{
             background: [
-              "radial-gradient(ellipse 78% 66% at 50% 50%, rgba(6,12,18,0.66) 0%, rgba(6,12,18,0.44) 58%, rgba(6,12,18,0.20) 100%)",
-              "linear-gradient(180deg, rgba(6,12,18,0.55) 0%, rgba(6,12,18,0) 26%, rgba(6,12,18,0) 68%, rgba(6,12,18,0.62) 100%)",
+              "linear-gradient(to top, rgba(6,13,16,0.86) 0%, rgba(6,13,16,0.50) 34%, rgba(6,13,16,0) 68%)",
+              "linear-gradient(to right, rgba(6,13,16,0.74) 0%, rgba(6,13,16,0.38) 30%, rgba(6,13,16,0.10) 52%, rgba(6,13,16,0) 70%)",
+              "linear-gradient(to bottom, rgba(6,13,16,0.40) 0%, rgba(6,13,16,0) 18%)",
             ].join(", "),
           }}
         />
@@ -531,7 +535,7 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
         <div
           role="status"
           aria-label="Loading"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-abyss)] transition-opacity duration-500 ease-out"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-9 bg-[var(--color-abyss)] transition-opacity duration-500 ease-out"
           style={{ opacity: splashDone ? 0 : 1, pointerEvents: splashDone ? "none" : "auto" }}
         >
           <Image
@@ -540,8 +544,13 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
             width={300}
             height={109}
             priority
-            className="w-[160px] md:w-[200px] h-auto animate-pulse"
+            className="w-[150px] md:w-[180px] h-auto"
           />
+          {/* The mark holds still and a hairline carries the waiting. A pulsing logo
+              is what a loading screen does when nobody designed it. */}
+          <span className="relative block h-px w-24 overflow-hidden bg-[var(--color-foam-faint)]">
+            <span className="absolute inset-y-0 left-0 w-1/3 animate-[sweep_1.6s_ease-in-out_infinite] bg-[var(--color-gilt-soft)]" />
+          </span>
         </div>
       )}
       {children}

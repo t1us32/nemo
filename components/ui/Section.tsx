@@ -48,11 +48,13 @@ export default function Section({ id, index, children }: Props) {
 
       tl.set(section, { opacity: 1 });
 
-      // A hairline drawn out from the left starts the whole thing.
+      // The hairline arrives from the edge of the frame — origin left, so it runs
+      // inward across the gutter and lands on the eyebrow rather than growing out
+      // of it. It starts the whole sequence.
       tl.fromTo(
         rule,
-        { scaleX: 0, transformOrigin: "center" },
-        { scaleX: 1, duration: 0.8, ease: ease.expo },
+        { scaleX: 0, transformOrigin: "left center" },
+        { scaleX: 1, duration: 0.9, ease: ease.expo },
         0
       );
       tl.fromTo(
@@ -66,8 +68,8 @@ export default function Section({ id, index, children }: Props) {
       tl.fromTo(
         words,
         { yPercent: 115 },
-        { yPercent: 0, duration: duration.line, ease: ease.expo, stagger: 0.075 },
-        0.16
+        { yPercent: 0, duration: duration.line, ease: ease.expo, stagger: 0.09 },
+        0.18
       );
       tl.addLabel("headlineEnd", ">-0.55");
 
@@ -127,13 +129,15 @@ export default function Section({ id, index, children }: Props) {
     }
 
     enter.pause();
-    // Leaving is one clean drift up, not a rewind of the entrance.
+    // Leaving is one clean drift up, not a rewind of the entrance. The drift is
+    // short on purpose: copy that flies off the frame reads cheap, copy that lifts
+    // a few pixels and fades reads like it was placed there.
     exitRef.current = gsap.to(section, {
       opacity: 0,
       duration: duration.exit,
       ease: ease.exit,
     });
-    gsap.to(inner, { y: -18, duration: duration.exit, ease: ease.exit });
+    gsap.to(inner, { y: -10, duration: duration.exit, ease: ease.exit });
   }, [visible, staged]);
 
   return (
@@ -155,31 +159,35 @@ export default function Section({ id, index, children }: Props) {
         pointerEvents: visible ? "auto" : "none",
         // Text-only layer: the video behind it belongs to the provider, so the ink
         // tokens flip to their on-footage values for everything nested here.
-        ["--color-ink-muted" as string]: "rgba(255,255,255,0.78)",
-        ["--color-ink-faint" as string]: "rgba(255,255,255,0.22)",
-        ["--color-current" as string]: "#7ec9ee",
+        ["--color-ink-muted" as string]: "rgba(246,243,238,0.74)",
+        ["--color-ink-faint" as string]: "rgba(246,243,238,0.20)",
       }}
     >
       <div
         ref={innerRef}
-        // Copy sits in the middle of the frame, centred both ways. The scroll area
-        // below owns any overflow, so plain centring can never push the top of the
-        // block off screen.
+        // Copy is anchored to the low left of the frame, not stamped in the middle
+        // of it. The subject of every shot — the building, the deck, the pools — is
+        // what the page is selling, and centred copy sits directly on top of it;
+        // held down here, the whole upper right of each frame stays clear.
         className={
           staged
-            ? "relative z-10 mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center text-center"
-            : "relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center text-center"
+            ? "relative z-10 flex h-full w-full flex-col items-start justify-end"
+            : "relative z-10 flex w-full flex-col items-start justify-end"
         }
       >
         {/* Its own scroll area: a card-heavy section can run taller than a short
             phone screen, and the staged page itself never scrolls to bail it out. */}
         <div
           data-scroll-area
-          className={`w-full px-6 py-24 md:px-10 md:py-16 ${
-            staged ? "max-h-full overflow-y-auto overscroll-contain" : ""
-          }`}
+          className={`w-full ${staged ? "max-h-full overflow-y-auto overscroll-contain" : ""}`}
+          style={{
+            paddingLeft: "var(--gutter)",
+            paddingRight: "var(--gutter)",
+            paddingTop: "7rem",
+            paddingBottom: "clamp(5.5rem, 15vh, 9rem)",
+          }}
         >
-          {children}
+          <div className="w-full max-w-[44rem]">{children}</div>
         </div>
       </div>
     </section>
