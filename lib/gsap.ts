@@ -23,8 +23,4 @@ export const duration = {
   exit: 0.35,
 } as const;
 
-export const prefersReducedMotion = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 export { gsap };

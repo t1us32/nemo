@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { content } from "@/lib/content";
-import { gsap, prefersReducedMotion } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 
 /** Kept in sync with the overlay's CSS transition duration below. */
 const MENU_FADE = 300;
@@ -15,17 +15,7 @@ export default function Header() {
   // frame after mount so the browser has an opacity:0 frame to fade in from.
   const [menuMounted, setMenuMounted] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [reduced, setReduced] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
-
-  // Live setting, not a load-time one — the same way the stage follows it.
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReduced(query.matches);
-    apply();
-    query.addEventListener("change", apply);
-    return () => query.removeEventListener("change", apply);
-  }, []);
 
   useEffect(() => {
     if (menuOpen) {
@@ -62,10 +52,6 @@ export default function Header() {
   useEffect(() => {
     if (!menuOpen || !menuRef.current) return;
     const items = menuRef.current.querySelectorAll("[data-menu-item]");
-    if (prefersReducedMotion()) {
-      gsap.set(items, { opacity: 1, y: 0 });
-      return;
-    }
     gsap.fromTo(
       items,
       { opacity: 0, y: 16 },
@@ -150,12 +136,10 @@ export default function Header() {
           className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-7"
           style={{
             background: "rgba(6,12,18,0.55)",
-            backdropFilter: menuVisible || reduced ? "blur(20px)" : "blur(0px)",
-            WebkitBackdropFilter: menuVisible || reduced ? "blur(20px)" : "blur(0px)",
-            opacity: menuVisible || reduced ? 1 : 0,
-            transition: reduced
-              ? "none"
-              : `opacity ${MENU_FADE}ms ease-out, backdrop-filter ${MENU_FADE}ms ease-out, -webkit-backdrop-filter ${MENU_FADE}ms ease-out`,
+            backdropFilter: menuVisible ? "blur(20px)" : "blur(0px)",
+            WebkitBackdropFilter: menuVisible ? "blur(20px)" : "blur(0px)",
+            opacity: menuVisible ? 1 : 0,
+            transition: `opacity ${MENU_FADE}ms ease-out, backdrop-filter ${MENU_FADE}ms ease-out, -webkit-backdrop-filter ${MENU_FADE}ms ease-out`,
           }}
         >
           {content.header.nav.map((item) => (

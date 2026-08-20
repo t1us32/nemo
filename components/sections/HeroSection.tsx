@@ -38,9 +38,6 @@ export default function HeroSection() {
           0% { transform: translateY(-100%); }
           100% { transform: translateY(200%); }
         }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-\\[scrollhint_1\\.8s_ease-in-out_infinite\\] { animation: none; }
-        }
       `}</style>
     </Section>
   );
