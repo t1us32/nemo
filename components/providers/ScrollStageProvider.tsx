@@ -501,7 +501,10 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
 
   return (
     <StageContext.Provider value={state}>
-      <div className="fixed inset-0 z-0" aria-hidden="true">
+      <div
+        className={staged ? "fixed inset-0 z-0" : "absolute inset-x-0 top-0 h-screen z-0"}
+        aria-hidden="true"
+      >
         {staged ? (
           <video
             ref={videoRef}
@@ -513,6 +516,10 @@ export default function ScrollStageProvider({ children }: { children: React.Reac
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
+          /* Reduced motion drops the stage: sections become a plain scrolling
+             document, so this backdrop must not stay pinned behind all of them —
+             it only fills the first screen, like a hero image, or it reads as a
+             stuck picture while everything else scrolls past it. */
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={stagePoster}
